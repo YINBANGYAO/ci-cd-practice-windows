@@ -1,0 +1,21 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "dev", "feature/*", "staging" ]
+  pull_request:
+    branches: [ "dev", "staging" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-app:${{ github.sha }}
+      
+    - name: Test the Docker image
+      run: |
+        docker run --rm my-app:${{ github.sha }} python -c "from app.app import dedupe, add; print('Docker image test passed!')"
